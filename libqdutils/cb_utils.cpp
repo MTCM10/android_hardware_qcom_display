@@ -37,8 +37,7 @@ namespace qdutils {
 bool CBUtils::sGPUlayerpresent = 0;
 
 void CBUtils::checkforGPULayer(const hwc_layer_list_t* list) {
-    sGPUlayerpresent =  false;
-    if (!list) return;
+    sGPUlayerpresent =  true;
     for(uint32_t index = 0; index < list->numHwLayers; index++) {
         const hwc_layer_t* layer = &list->hwLayers[index];
         if(layer->compositionType == HWC_FRAMEBUFFER) {
@@ -84,8 +83,10 @@ bool CBUtils::isUpdatingFB(int Type)
 int CBUtils::qcomuiClearRegion(Region region, EGLDisplay dpy){
 
     int ret = 0;
-    if (sGPUlayerpresent) {
-        //return ERROR when any layer is flagged for GPU composition.
+    int compositionType = QCCompositionType::getInstance().getCompositionType();
+    if ((compositionType == COMPOSITION_TYPE_GPU) || sGPUlayerpresent) {
+        //return ERROR when GPU composition is used or any layer is flagged
+        //for GPU composition.
         return -1;
     }
 
